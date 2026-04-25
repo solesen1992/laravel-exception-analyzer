@@ -1,4 +1,92 @@
-# Sekvens – hele kæden som trin-for-trin
+# Laravel Exception Analyzer
+A Laravel package that helps you understand your errors - not just log them.
+
+It can be installed directly into a Laravel project and will automatically collect, group, and analyze exceptions to give you a clear overview of what’s actually going wrong.
+
+⚠️ Proof of concept built for a real-world use case
+
+## 📌 The Problem
+This project was built for a company where all errors were sent directly to the communication platform Slack.
+
+At peak times, they received 300+ error messages per hour.
+
+The result:
+- no real overview
+- repeated errors looked like new ones
+- important issues were buried in noise
+
+👉 It became almost impossible to understand what was actually wrong.
+
+## 💡 The Solution
+This package replaces noisy error streams with structured insight.
+
+It:
+- captures exceptions automatically
+- stores them in a database
+- groups similar errors together
+- tracks how often they occur
+- detects when issues are resolved
+
+👉 Instead of hundreds of messages, you get a few clear problems to focus on.
+
+## 🔄 How It Works
+1) The package hooks into Laravel’s exception handling
+2) All exceptions are stored automatically
+3) Background jobs analyze and group errors
+4) Recurring issues are tracked over time
+5) Issues are marked as resolved when they stop occurring
+
+This allows developers to:
+- identify recurring issues
+- understand error patterns over time
+- prioritize fixes based on impact
+- track when problems are actually resolved
+
+## 🔄 System Overview
+
+The analyzer is part of a larger exception-handling flow:
+1) An exception occurs in a Laravel application
+2) Laravel’s built-in ExceptionHandler is triggered
+3) A custom reportable callback intercepts the exception
+4) The exception is stored as raw data in the database
+5) A scheduled process analyzes and structures the data
+6) Exceptions are grouped into recurring issues
+7) Resolved issues are automatically detected and closed
+
+This design ensures that no exception is lost, while analysis happens asynchronously for stability.
+
+## 🧠 Key Concepts
+### Raw vs Structured Exceptions
+- Raw exceptions are stored immediately when they occur
+- Structured exceptions are created later through AI-based classification
+
+This separation ensures that failures in the analysis layer never affect data collection.
+
+### Exception Grouping (CFL)
+Exceptions are grouped using a CFL (Carrier-File-Line) identifier:
+- identifies the technical origin of an error
+- enables grouping of similar exceptions
+- provides insight into recurring issues
+
+This makes it possible to detect patterns instead of treating errors individually.
+
+### Repetitive Exceptions
+Recurring issues are stored as RepetitiveExceptions, which:
+- represent a known problem
+- are continuously updated if the issue persists
+- are automatically marked as resolved when no longer occurring
+
+This ensures that only active problems remain visible.
+
+### AI-Based Classification
+Exceptions are analyzed using an AI component that:
+- classifies severity
+- determines whether the error is internal or external
+- extracts meaningful metadata
+
+The AI returns structured JSON, making results directly usable in the system.
+
+# Sekvens (Danish / dansk) – hele kæden som trin-for-trin
 1) En exception opstår i Laravel-applikationen.
 
 
@@ -6,9 +94,7 @@
 
 
 3) Facaden tjekker i config('laravel-exception-analyzer'), om analysen er slået til (isEnabled).
-
 - Hvis den er slået fra → der sker ikke mere.
-
 - Hvis den er slået til → facaden resolver LaravelExceptionAnalyzer-servicen fra containeren og kalder $analyzer->report($exception).
 
 
@@ -17,57 +103,29 @@
 
 5) ReportClient har en injiceret AiClient.
    I ReportClient::report():
-
 - kalder den $this->aiClient->classify($exception).
 
 
 6) AiClient:
 - læser AI-config (enabled, api_key, endpoint, timeout)
-
 - hvis AI er deaktiveret eller config mangler → returnerer null
-
 - ellers saniterer den exceptionen via ExceptionSanitizer::sanitize()
-
 - sender den saniterede payload til AI-service via Http::post()
-
 - hvis AI svarer succesfuldt med JSON, mapper den svaret til et AiClassificationResult-objekt
 
 
 7) ReportClient får AiClassificationResult tilbage (eller null ved fejl).
-
 - Hvis resultatet findes, kan det logges eller gemmes i databasen.
-
 - I vores nuværende kode logges resultatet (eller er klar til at blive gemt, når DB-delen er klar).
 
 
 8) På den måde bliver hver exception automatisk klassificeret mht.:
+- category
+- source
+- severity
+- status_message 
 
-category
-
-source
-
-severity
-
-status_message 
-
-# This is my package laravel-exception-analyzer
-
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/150657373-nikolajve/laravel-exception-analyzer.svg?style=flat-square)](https://packagist.org/packages/150657373-nikolajve/laravel-exception-analyzer)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/150657373-nikolajve/laravel-exception-analyzer/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/150657373-nikolajve/laravel-exception-analyzer/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/150657373-nikolajve/laravel-exception-analyzer/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/150657373-nikolajve/laravel-exception-analyzer/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/150657373-nikolajve/laravel-exception-analyzer.svg?style=flat-square)](https://packagist.org/packages/150657373-nikolajve/laravel-exception-analyzer)
-
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-exception-analyzer.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-exception-analyzer)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
-
-## Installation
+# Installation
 
 You can install the package via composer:
 
