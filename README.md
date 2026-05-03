@@ -55,6 +55,12 @@ The analyzer is part of a larger exception-handling flow:
 
 This design ensures that no exception is lost, while analysis happens asynchronously for stability.
 
+## Tech stack
+- Docker so we had the same environment in development.
+- Mistral AI (locally on each pc)
+- Laravel (PHP web application framework)
+- Frontend: Blade, HTML, CSS 
+
 ## 🧠 Key Concepts
 ### Raw vs Structured Exceptions
 - Raw exceptions are stored immediately when they occur
