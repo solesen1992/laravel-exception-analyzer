@@ -8,7 +8,7 @@ It can be installed directly into a Laravel project and will automatically colle
 ## 📌 The Problem
 This project was built for a company where all errors were sent directly to the communication platform Slack.
 
-At peak times, they received 300+ error messages per hour.
+At peak times, they received 150 error messages per minute.
 
 The result:
 - no real overview
